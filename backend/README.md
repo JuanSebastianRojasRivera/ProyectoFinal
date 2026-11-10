@@ -1,438 +1,284 @@
-# PymesDataStrategyBackEnd
+# PymesDataStrategy
 
-> **Proyecto de Grado GIIS SW-005 — Fundación Universitaria Compensar**
-> API Gateway + Worker ETL con IA y Human-in-the-Loop para PYMES en Bogotá, Colombia.
+**Plataforma inteligente de gestión, procesamiento y análisis de datos para pequeñas y medianas empresas.**
 
-![Estado](https://img.shields.io/badge/Wave%202-COMPLETADA-brightgreen)
-![API Tests](https://img.shields.io/badge/API%20tests-337%20pasando-brightgreen)
-![Worker Tests](https://img.shields.io/badge/Worker%20tests-308%20pasando-brightgreen)
-![Node.js](https://img.shields.io/badge/Node.js-20-green)
-![Python](https://img.shields.io/badge/Python-3.12-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
-![Licencia](https://img.shields.io/badge/licencia-MIT-blue)
+PymesDataStrategy es una plataforma tecnológica que integra procesos ETL, inteligencia artificial y herramientas de análisis para facilitar la gestión y transformación de información empresarial.
+
+La solución permite cargar conjuntos de datos, ejecutar procesos de procesamiento, identificar anomalías, aplicar transformaciones y supervisar los resultados mediante mecanismos de validación humana (*Human-in-the-Loop*).
 
 ---
 
-## 📋 Descripción
+## Características principales
 
-**PymesDataStrategyBackEnd** es el núcleo de la plataforma **PymesDataStrategy**, un sistema ETL potenciado con Inteligencia Artificial y un proceso de validación **Human-in-the-Loop (HITL)** diseñado para pequeñas y medianas empresas (PYMES) de Bogotá.
+- **Gestión de datasets:** carga, organización y consulta de conjuntos de datos.
+- **Procesamiento ETL:** extracción, transformación y procesamiento de información.
+- **Detección de anomalías:** identificación de inconsistencias y valores atípicos.
+- **Inteligencia artificial:** asistencia para el análisis y transformación de datos.
+- **Human-in-the-Loop:** revisión, aprobación, corrección y descarte de anomalías.
+- **Procesamiento automatizado:** ejecución y seguimiento de trabajos ETL.
+- **Analítica empresarial:** consulta de estadísticas e información de las empresas.
+- **Almacenamiento de archivos:** gestión de archivos mediante MinIO.
+- **Actualizaciones de procesos:** seguimiento de trabajos y estados de ejecución.
 
-El backend orquesta la carga y procesamiento de archivos CSV/Excel, detecta anomalías automáticamente, genera sugerencias AI con Gemini, y permite que un analista humano revise y apruebe cada corrección antes de producir el archivo de datos limpio.
+## Arquitectura general
 
-### 🔗 Repositorios
+El sistema utiliza una arquitectura modular organizada en diferentes servicios:
 
-| Repositorio | Enlace |
+| Componente | Responsabilidad |
 |---|---|
-| **Backend** (este repo) | https://github.com/jcgmU/PymesDataStrategyBackEnd.git |
-| **Frontend** | https://github.com/jcgmU/PymesDataStrategyFrontEnd.git |
+| Frontend | Interfaz web para interactuar con la plataforma. |
+| API Gateway | Gestión de solicitudes y lógica principal del backend. |
+| Worker ETL | Procesamiento y transformación de datos. |
+| PostgreSQL | Persistencia de información del sistema principal. |
+| Redis | Gestión de colas y comunicación de trabajos. |
+| MinIO | Almacenamiento de archivos y objetos. |
+| Dashboard Backend | Servicios de autenticación, empresas, carga y estadísticas. |
+| Dashboard Agent | Agente de inteligencia artificial para consultas y análisis. |
+| Dashboard Database | Persistencia de información del dashboard. |
+| MinIO Init | Inicialización de la configuración de almacenamiento. |
 
+## Tecnologías utilizadas
 
-## ✅ Funcionalidades Implementadas
+**Frontend**
+- Next.js 16.
+- React.
+- TypeScript.
+- Tailwind CSS.
+- Zustand.
+- React Query.
+- NextAuth.
 
-### Core ETL y HITL
+**Backend**
+- Node.js 22.
+- TypeScript.
+- Prisma.
+- PostgreSQL.
+- Redis.
+- BullMQ.
 
-| # | Funcionalidad | Estado |
-|---|---|---|
-| 1 | Subida de archivos CSV / Excel (.xlsx, .xls) hasta 10 MB | ✅ |
-| 2 | Detección automática de anomalías (MISSING_VALUE + OUTLIER Z-score > 3) | ✅ |
-| 3 | Revisión Human-in-the-Loop — aprobar / corregir / descartar por anomalía | ✅ |
-| 4 | 6 transformaciones ETL — imputación, outliers, normalización, deduplicación, fechas, escalado | ✅ |
-| 5 | Descarga del archivo Excel corregido desde MinIO | ✅ |
-| 6 | Dashboard de métricas globales (datasets, jobs, anomalías) | ✅ |
+**Procesamiento e inteligencia artificial**
+- Python 3.12.
+- FastAPI.
+- Uvicorn.
+- Polars / Pandas.
+- Google Gemini.
 
-### Inteligencia Artificial
+**Infraestructura**
+- Docker.
+- Docker Compose.
+- MinIO.
 
-| # | Funcionalidad | Estado |
-|---|---|---|
-| 7 | **NL Edit** — correcciones en lenguaje natural español por anomalía | ✅ |
-| 8 | Parser de reglas local (media, mediana, eliminar, mantener, literales) sin costo API | ✅ |
-| 9 | Fallback Gemini para instrucciones complejas (condicionales, transformaciones) | ✅ |
-| 10 | **Sugerencias AI automáticas** — Worker → Gemini directo con contexto del DataFrame | ✅ |
-| 11 | Vista previa del IR antes de confirmar la corrección | ✅ |
+## Estructura del repositorio
 
-### Tiempo Real
+```text
+ProyectoFinal/
+│
+├── backend/
+│   ├── api/
+│   │   ├── src/
+│   │   └── Dockerfile.dev
+│   │
+│   ├── worker/
+│   │   ├── src/
+│   │   ├── pyproject.toml
+│   │   └── Dockerfile.dev
+│   │
+│   ├── docker/
+│   │   └── postgres/
+│   │       └── init.sql
+│   │
+│   ├── docker-compose.yml
+│   ├── package.json
+│   ├── .env.example
+│   └── README.md
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   ├── next.config.ts
+│   ├── Dockerfile.dev
+│   └── README.md
+│
+├── services/
+│   └── dashboard-pymes/
+│       ├── backend/
+│       └── agent/
+│
+├── mockups/
+│
+└── README.md
+```
 
-| # | Funcionalidad | Estado |
-|---|---|---|
-| 12 | SSE por job — `GET /api/v1/jobs/:id/events` — estado en tiempo real | ✅ |
-| 13 | SSE global del workspace — `GET /api/v1/events` — notifica cambios de datasets | ✅ |
-| 14 | Tabla de datasets se actualiza automáticamente sin recargar la página | ✅ |
+## Requisitos previos
 
-### Autenticación
+Para ejecutar la plataforma mediante contenedores se necesita:
 
-| # | Funcionalidad | Estado |
-|---|---|---|
-| 15 | Registro y login con JWT | ✅ |
-| 16 | Middleware de autenticación — Bearer header o `?token=` query param (SSE) | ✅ |
-| 17 | Swagger / OpenAPI interactivo en `/api/docs` | ✅ |
+- Git.
+- Docker Desktop.
+- Docker Compose v2.
+- Conexión a internet para descargar imágenes y dependencias.
 
----
+No es necesario instalar PostgreSQL, Redis, Node.js o Python para iniciar la plataforma completa mediante Docker.
 
-## 🚀 Inicio Rápido (Levantamiento Completo)
+## Instalación y ejecución
 
-### Prerrequisitos
-
-- **Docker Desktop** instalado y corriendo
-- **Git**
-- Puertos `3000`, `3001`, `5433`, `6380`, `8000`, `9000`, `9001` disponibles
-
-### 1. Clonar repositorios
+### 1. Clonar el repositorio
 
 ```bash
-# Crear carpeta raíz del proyecto
-mkdir proyecto && cd proyecto
-
-# Clonar backend (este repositorio)
-git clone https://github.com/jcgmU/PymesDataStrategyBackEnd.git backend
-
-# Clonar frontend al mismo nivel
-git clone https://github.com/jcgmU/PymesDataStrategyFrontEnd.git frontend
+git clone https://github.com/JuanSebastianRojasRivera/ProyectoFinal.git
 ```
 
-> ⚠️ **Importante:** Ambas carpetas deben estar al mismo nivel. El `docker-compose.yml` del backend referencia al frontend con ruta relativa `../frontend`.
+### 2. Ingresar al proyecto
 
-```
-proyecto/
-├── backend/    ← este repositorio
-└── frontend/   ← repositorio del frontend
+```bash
+cd ProyectoFinal
 ```
 
-### 2. Configurar variables de entorno
+### 3. Ingresar al directorio del backend
+
+El archivo Docker Compose se encuentra dentro de `backend/`. Por esta razón, los comandos de Docker Compose deben ejecutarse desde ese directorio.
 
 ```bash
 cd backend
+```
+
+### 4. Configurar las variables de entorno
+
+Crear el archivo `.env` a partir de la plantilla:
+
+**Linux / macOS:**
+
+```bash
 cp .env.example .env
 ```
 
-Editar `.env` y completar:
+**Windows PowerShell:**
 
-| Variable | Requerida | Descripción |
-|---|---|---|
-| `GEMINI_API_KEY` | Para NL Edit y AI | Obtener en [aistudio.google.com](https://aistudio.google.com/app/apikey) |
-| `GEMINI_MODEL` | No (default: `gemini-2.5-flash`) | Modelo Gemini a usar |
-| `JWT_SECRET` | Sí en producción | Cambiar valor por defecto |
-| `NEXTAUTH_SECRET` | Sí en producción | Cambiar valor por defecto |
+```powershell
+Copy-Item .env.example .env
+```
 
-> **Sin `GEMINI_API_KEY`** el NL Edit solo acepta instrucciones literales. Las sugerencias AI automáticas no se generan.
+Revisar el archivo `.env` y completar las variables necesarias para el entorno local.
 
-> **Modelo recomendado:** `gemini-2.5-flash`. Los modelos `gemini-2.0-flash` y `gemini-2.0-flash-exp` ya no están disponibles para cuentas nuevas de Google AI Studio.
+Para utilizar las funcionalidades de inteligencia artificial, configurar la clave `GEMINI_API_KEY` cuando corresponda.
 
-### 3. Construir y levantar el stack
+No publicar el archivo `.env` ni compartir credenciales privadas.
+
+### 5. Construir e iniciar la plataforma
+
+Desde el directorio `backend/` ejecutar:
 
 ```bash
-cd backend
+docker compose up --build -d
+```
 
-# Primera vez — construir imágenes
-docker compose build
+Este comando construye las imágenes e inicia los servicios definidos en `docker-compose.yml`.
 
-# Levantar todos los servicios
-docker compose up -d
+### 6. Verificar los contenedores
 
-# Verificar estado
+```bash
 docker compose ps
 ```
 
-Esperar ~30-60 segundos hasta que todos los servicios aparezcan como `healthy`.
+Comprobar que los servicios se encuentren en ejecución y revisar su estado.
 
-### Comandos disponibles
+### 7. Consultar los registros
 
-| Comando | Descripción |
+Para consultar los registros de todos los servicios:
+
+```bash
+docker compose logs -f
+```
+
+Para consultar un servicio específico:
+
+```bash
+docker compose logs -f api
+```
+
+El nombre del servicio debe coincidir con el definido en el archivo Docker Compose.
+
+---
+
+## Direcciones de acceso
+
+| Servicio | Dirección |
 |---|---|
-| `docker compose up -d` | Levantar todos los servicios en background |
-| `docker compose ps` | Ver estado de los servicios |
-| `docker compose logs -f` | Logs en tiempo real (todos los servicios) |
-| `docker compose logs -f pymes-worker` | Logs de un servicio específico |
-| `docker compose down` | Detener todos los servicios |
-| `docker compose down -v` | Detener y borrar volúmenes (resetea BD) |
-| `docker compose build --no-cache` | Reconstruir imágenes desde cero |
-| `make test-api` | Ejecutar tests del API Gateway |
-| `make test-worker` | Ejecutar tests del Worker ETL |
+| Aplicación web | http://localhost:3001 |
+| API Gateway | http://localhost:3000 |
+| Documentación Swagger | http://localhost:3000/api/docs |
+| Health Check API | http://localhost:3000/health |
+| Worker ETL | http://localhost:8000 |
+| MinIO API | http://localhost:9000 |
+| MinIO Console | http://localhost:9001 |
+| Dashboard Backend | http://localhost:3002 |
+| Dashboard Agent | http://localhost:8001 |
+| Dashboard Agent Docs | http://localhost:8001/docs |
 
----
+La base de datos del dashboard funciona como servicio interno y no requiere una interfaz web para utilizar la plataforma.
 
-## 🐳 Servicios Docker
+## Verificación del funcionamiento
 
-| Servicio | URL | Descripción |
-|---|---|---|
-| `pymes-frontend` | http://localhost:3001 | Next.js 16 + NextAuth v5 |
-| `pymes-api` | http://localhost:3000 | API Gateway (Express + TypeScript) |
-| `pymes-api` | http://localhost:3000/api/docs | Swagger UI interactivo |
-| `pymes-worker` | http://localhost:8000 | Worker ETL (FastAPI + Python) |
-| `pymes-minio` | http://localhost:9001 | Consola MinIO (admin: `minioadmin` / `minioadmin123`) |
-| `pymes-postgres` | localhost:5433 | PostgreSQL 16 |
-| `pymes-redis` | localhost:6380 | Redis 7 (BullMQ broker) |
-| `pymes-minio-init` | — | Crea buckets al inicio (one-shot) |
+Después de iniciar los contenedores, se recomienda realizar las siguientes comprobaciones:
 
-> Los puertos locales usan 5433 y 6380 (en vez de 5432 y 6379) para evitar conflictos con instalaciones locales.
+1. Consultar el estado de los contenedores con `docker compose ps`.
+2. Abrir la aplicación web en el navegador.
+3. Consultar la documentación Swagger de la API.
+4. Verificar el endpoint `/health` de la API principal.
+5. Verificar el endpoint `/health` del Worker ETL.
+6. Consultar el endpoint `/api/health` del Dashboard Backend.
+7. Verificar el endpoint `/health` del Dashboard Agent.
+8. Comprobar que MinIO esté disponible en el puerto 9001.
 
----
+La disponibilidad de cada servicio depende de su configuración y de que haya iniciado correctamente.
 
-## 🔧 Variables de Entorno
+## Detener la plataforma
 
-```bash
-cp .env.example .env
-```
-
-| Variable | Default | Descripción |
-|---|---|---|
-| `POSTGRES_USER` | `pymes` | Usuario PostgreSQL |
-| `POSTGRES_PASSWORD` | `pymes_dev_password` | Contraseña PostgreSQL |
-| `POSTGRES_PORT` | `5433` | Puerto local PostgreSQL |
-| `REDIS_PORT` | `6380` | Puerto local Redis |
-| `API_PORT` | `3000` | Puerto API Gateway |
-| `WORKER_PORT` | `8000` | Puerto Worker ETL |
-| `JWT_SECRET` | (dev value) | **Cambiar en producción** |
-| `NEXTAUTH_SECRET` | (dev value) | **Cambiar en producción** |
-| `GEMINI_API_KEY` | vacío | API key de Google AI Studio |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Modelo Gemini |
-| `INSTRUCTION_PARSER_ENABLED` | `true` | Habilita NL Edit con Gemini |
-| `N8N_SUGGESTIONS_WEBHOOK_URL` | vacío | Fallback n8n (opcional) |
-
-Ver `.env.example` para la lista completa con descripciones.
-
----
-
-## 🔌 Endpoints API
-
-Base: `/api/v1` — Documentación interactiva: http://localhost:3000/api/docs
-
-### Autenticación
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| POST | `/auth/register` | Registrar nuevo usuario |
-| POST | `/auth/login` | Login — retorna JWT |
-| GET | `/auth/users/me` | Usuario autenticado |
-| PATCH | `/auth/users/me` | Actualizar perfil |
-
-### Datasets y ETL
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| POST | `/datasets` | Subir archivo CSV/Excel (multipart) |
-| GET | `/datasets` | Listar datasets del usuario |
-| GET | `/datasets/:id` | Obtener dataset por ID |
-| DELETE | `/datasets/:id` | Eliminar dataset |
-| POST | `/datasets/:id/transform` | Iniciar job ETL |
-| GET | `/datasets/:id/anomalies` | Listar anomalías detectadas |
-| POST | `/datasets/:id/decisions` | Enviar decisiones HITL |
-| POST | `/datasets/:id/anomalies/:anomalyId/parse-instruction` | Parsear instrucción NL a IR |
-| GET | `/datasets/:id/download` | URL de descarga del archivo procesado |
-
-### Jobs y Tiempo Real
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/jobs/:id` | Estado de un job |
-| GET | `/jobs/:id/events` | SSE — estado del job en tiempo real |
-| GET | `/events` | SSE — cambios globales del workspace |
-
-### Estadísticas y Health
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/stats` | Métricas globales (datasets, jobs, anomalías) |
-| GET | `/health` | Health check básico |
-
----
-
-## 🔄 Flujo Human-in-the-Loop
-
-```
-1. Usuario sube CSV/Excel         →  POST /api/v1/datasets/transform
-2. Worker detecta anomalías       →  MISSING_VALUE + OUTLIER (Z-score > 3)
-3. Worker llama Gemini (directo)  →  genera sugerencias AI por anomalía
-4. Dataset queda en estado        →  PROCESSING (esperando decisiones)
-5. Usuario revisa anomalías       →  GET /api/v1/datasets/:id/anomalies
-6. Usuario decide por cada una:
-   ├── Aprobar                    →  mantiene el valor original
-   ├── Corregir (manual/NL Edit)  →  escribe instrucción → vista previa → confirma
-   └── Descartar                  →  elimina la fila
-7. Envía todas las decisiones     →  POST /api/v1/datasets/:id/decisions
-8. Worker aplica correcciones     →  genera archivo limpio en MinIO
-9. Dataset pasa a READY           →  usuario descarga el Excel corregido
-```
-
----
-
-## 📁 Estructura del Proyecto
-
-```
-backend/
-├── api/                              # API Gateway (Node.js + TypeScript)
-│   └── src/
-│       ├── domain/                   # Núcleo hexagonal — sin dependencias externas
-│       │   ├── entities/             # Dataset, Anomaly, Decision, User
-│       │   ├── value-objects/        # DatasetId, etc.
-│       │   ├── ports/                # Interfaces de repositorios y servicios
-│       │   ├── ir/                   # IR (Intermediate Representation) — NL Edit
-│       │   └── errors/               # Errores de dominio tipados
-│       ├── application/              # Casos de uso
-│       │   ├── use-cases/            # CreateDataset, SubmitDecisions, ParseInstruction...
-│       │   └── services/             # InstructionParser (reglas + Gemini)
-│       └── infrastructure/           # Adaptadores
-│           ├── config/               # Container DI, env validation (Zod)
-│           ├── http/
-│           │   ├── controllers/      # Dataset, Job, Events, Webhook, Stats
-│           │   ├── middleware/       # Auth JWT
-│           │   └── routes/           # Registro de rutas + Swagger
-│           ├── messaging/
-│           │   └── bullmq/           # JobQueue, QueueEvents, DatasetStatusSyncListener
-│           ├── persistence/          # Prisma repositories
-│           └── storage/              # MinIO adapter
-├── worker/                           # Worker ETL (Python + FastAPI)
-│   └── src/
-│       ├── domain/                   # Entidades, puertos (AiSuggestionService port)
-│       ├── application/              # ProcessDatasetUseCase — detecta, sugiere, aplica
-│       └── infrastructure/
-│           ├── ai/                   # GeminiSuggestionService (Opción C — directo)
-│           ├── config/               # Container DI, Settings (Pydantic)
-│           ├── http/                 # FastAPI app, health endpoint
-│           ├── messaging/            # BullMQ consumer
-│           ├── parsers/              # Dataset parser (CSV/Excel → Polars)
-│           └── persistence/          # SQLAlchemy models + repositories
-├── prisma/                           # Schema + 3 migraciones aplicadas
-│   ├── schema.prisma
-│   └── migrations/
-│       ├── 20260310.../              # Tablas base (users, datasets, jobs)
-│       ├── 20260315.../              # Tablas HITL (anomalies, decisions)
-│       └── 20260406.../              # ai_suggestion en anomalies (Wave 2)
-├── docker/                           # Configuraciones Docker por servicio
-├── docker-compose.yml                # 7 servicios orquestados
-├── Makefile                          # Comandos de desarrollo
-└── .env.example                      # Plantilla de variables de entorno
-```
-
----
-
-## 🧪 Tests
-
-### API Gateway (Vitest)
+Para detener los servicios sin eliminar los datos persistentes:
 
 ```bash
-# Ejecutar los 337 tests
-make test-api
-
-# Con cobertura
-cd api && pnpm test:coverage
+docker compose down
 ```
 
-| Suite | Tests | Descripción |
-|---|---|---|
-| Use cases | ~150 | CreateDataset, SubmitDecisions, ParseInstruction... |
-| Services | ~50 | InstructionParser (reglas + Gemini mock) |
-| Controllers | ~80 | HTTP handlers + validación |
-| Repositories | ~57 | Prisma adapters |
-
-### Worker ETL (pytest)
+Para reconstruir las imágenes:
 
 ```bash
-# Ejecutar los 308 tests
-make test-worker
-
-# Con cobertura HTML
-cd worker && uv run pytest --cov=src --cov-report=html
+docker compose up --build -d
 ```
 
-| Suite | Tests | Descripción |
-|---|---|---|
-| ProcessDatasetUseCase | ~120 | ETL completo, HITL, NL Edit execution |
-| GeminiSuggestionService | ~30 | Sugerencias AI directas |
-| Repositories | ~80 | PostgreSQL persistence |
-| Parsers | ~78 | CSV/Excel parsing con Polars |
-
----
-
-## 🔍 Solución de Problemas
-
-### Worker no inicia — `ModuleNotFoundError: No module named 'google'`
-
-La imagen Docker está desactualizada. Reconstruir:
+**Importante:** el siguiente comando elimina también los volúmenes y puede borrar las bases de datos y los archivos almacenados:
 
 ```bash
-docker compose build worker
-docker compose up -d worker
-```
-
-### Modelos Gemini retornan 404
-
-Los modelos `gemini-2.0-flash` y `gemini-2.0-flash-exp` ya no están disponibles para cuentas nuevas. Actualizar en `.env`:
-
-```env
-GEMINI_MODEL=gemini-2.5-flash
-```
-
-Luego reiniciar:
-
-```bash
-docker compose up -d --force-recreate api worker
-```
-
-### La tabla de datasets no se actualiza
-
-Verificar que el SSE global está conectado (sin errores en la consola del navegador en `http://localhost:3001`). El polling de respaldo es cada 3 segundos mientras haya datasets en procesamiento.
-
-### Conflictos de puertos
-
-Ajustar en `.env`:
-
-```env
-POSTGRES_PORT=5433    # cambiar si el 5433 está ocupado
-REDIS_PORT=6380       # cambiar si el 6380 está ocupado
-```
-
-### Problemas con BD / migraciones
-
-```bash
-# Las migraciones se aplican automáticamente al iniciar
-# Si hay problemas, aplicar manualmente:
-docker exec pymes-api pnpm exec prisma migrate deploy --schema=prisma/schema.prisma
-
-# Resetear BD — ADVERTENCIA: borra todos los datos
 docker compose down -v
-docker compose up -d
 ```
+
+Utilizarlo únicamente cuando se quiera reiniciar el entorno y se tenga claro que se perderán los datos persistentes.
+
+## Configuración de inteligencia artificial
+
+La plataforma integra Google Gemini para determinadas funcionalidades de análisis y asistencia mediante inteligencia artificial.
+
+Para habilitar las funciones que dependen de este proveedor, configurar la variable correspondiente:
+
+```env
+GEMINI_API_KEY=tu_clave_de_google_gemini
+```
+
+La variable `GEMINI_MODEL` permite configurar el modelo cuando el servicio la contempla.
+
+Sin una clave válida, los servicios pueden iniciar, pero las operaciones que dependen de Gemini no estarán disponibles correctamente.
+
+## Documentación adicional
+
+- [Documentación del Backend](backend/README.md)
+- [Documentación del Frontend](frontend/README.md)
+
+## Repositorio
+
+https://github.com/JuanSebastianRojasRivera/ProyectoFinal
 
 ---
 
-## 🗺️ Próximos Pasos — Wave 3
-
-- [ ] **Roles y permisos** — Diferenciación entre administrador y analista
-- [ ] **Migración a `google.genai`** — El SDK `google-generativeai` está deprecado; actualizar a `google-genai`
-- [ ] **Historial de correcciones** — Trazabilidad completa por dataset y usuario
-- [ ] **Webhooks configurables** — Notificaciones externas al completar el ETL
-
----
-
-## 📄 Licencia
-
-Este proyecto está licenciado bajo la **Licencia MIT**.
-
-```
-MIT License
-
-Copyright (c) 2025 GIIS SW-005 — Fundación Universitaria Compensar
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-```
-
----
-
-<div align="center">
-
-**Proyecto de Grado GIIS SW-005**
-Fundación Universitaria Compensar — Bogotá, Colombia
-
-</div>
+**PymesDataStrategy**  
+Plataforma de procesamiento inteligente y análisis de datos empresariales.
