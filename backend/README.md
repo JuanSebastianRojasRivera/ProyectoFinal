@@ -1,151 +1,198 @@
-# PymesDataStrategy
+# PymesDataStrategy - Backend
 
-**Plataforma inteligente de gestión, procesamiento y análisis de datos para pequeñas y medianas empresas.**
+El backend de PymesDataStrategy contiene los servicios encargados de gestionar las operaciones principales de la plataforma, procesar información empresarial, coordinar trabajos ETL y proporcionar los mecanismos de comunicación entre los diferentes componentes.
 
-PymesDataStrategy es una plataforma tecnológica que integra procesos ETL, inteligencia artificial y herramientas de análisis para facilitar la gestión y transformación de información empresarial.
-
-La solución permite cargar conjuntos de datos, ejecutar procesos de procesamiento, identificar anomalías, aplicar transformaciones y supervisar los resultados mediante mecanismos de validación humana (*Human-in-the-Loop*).
+Está compuesto por una API Gateway desarrollada con Node.js y TypeScript, un Worker ETL desarrollado en Python y servicios de infraestructura para persistencia, colas y almacenamiento.
 
 ---
 
-## Características principales
+## Arquitectura del backend
 
-- **Gestión de datasets:** carga, organización y consulta de conjuntos de datos.
-- **Procesamiento ETL:** extracción, transformación y procesamiento de información.
-- **Detección de anomalías:** identificación de inconsistencias y valores atípicos.
-- **Inteligencia artificial:** asistencia para el análisis y transformación de datos.
-- **Human-in-the-Loop:** revisión, aprobación, corrección y descarte de anomalías.
-- **Procesamiento automatizado:** ejecución y seguimiento de trabajos ETL.
-- **Analítica empresarial:** consulta de estadísticas e información de las empresas.
-- **Almacenamiento de archivos:** gestión de archivos mediante MinIO.
-- **Actualizaciones de procesos:** seguimiento de trabajos y estados de ejecución.
+### 1. API Gateway
 
-## Arquitectura general
+Servicio principal desarrollado con Node.js y TypeScript.
 
-El sistema utiliza una arquitectura modular organizada en diferentes servicios:
+Se encarga de recibir y gestionar las solicitudes de la aplicación web, coordinar las operaciones internas y proporcionar los endpoints necesarios para utilizar las funcionalidades de la plataforma.
 
-| Componente | Responsabilidad |
-|---|---|
-| Frontend | Interfaz web para interactuar con la plataforma. |
-| API Gateway | Gestión de solicitudes y lógica principal del backend. |
-| Worker ETL | Procesamiento y transformación de datos. |
-| PostgreSQL | Persistencia de información del sistema principal. |
-| Redis | Gestión de colas y comunicación de trabajos. |
-| MinIO | Almacenamiento de archivos y objetos. |
-| Dashboard Backend | Servicios de autenticación, empresas, carga y estadísticas. |
-| Dashboard Agent | Agente de inteligencia artificial para consultas y análisis. |
-| Dashboard Database | Persistencia de información del dashboard. |
-| MinIO Init | Inicialización de la configuración de almacenamiento. |
+Entre sus responsabilidades se encuentran:
+
+- Gestión de solicitudes HTTP.
+- Administración de operaciones de la plataforma.
+- Gestión de conjuntos de datos.
+- Integración con PostgreSQL mediante Prisma.
+- Coordinación de trabajos de procesamiento.
+- Comunicación mediante Redis y BullMQ.
+- Sincronización de estados de trabajos.
+- Exposición de documentación mediante Swagger / OpenAPI.
+- Verificación del estado del servicio.
+
+**Documentación:**
+
+http://localhost:3000/api/docs
+
+**Health Check:**
+
+```http
+GET /health
+```
+
+### 2. Worker ETL
+
+Servicio desarrollado en Python y FastAPI, encargado de ejecutar procesos de transformación y procesamiento de información.
+
+Sus principales responsabilidades son:
+
+- Consumo de trabajos desde colas Redis mediante BullMQ.
+- Procesamiento de conjuntos de datos.
+- Transformación de información mediante Polars y Pandas.
+- Integración con almacenamiento MinIO.
+- Ejecución de procesos ETL.
+- Gestión de tareas relacionadas con la transformación de datos.
+- Soporte para flujos de validación y asistencia mediante inteligencia artificial.
+
+**Puerto:** `8000`
+
+**Endpoints de salud:**
+
+```http
+GET /health
+GET /health/live
+GET /health/ready
+```
+
+### 3. PostgreSQL
+
+Base de datos principal utilizada para almacenar la información estructurada de la plataforma.
+
+El esquema se gestiona mediante Prisma y la inicialización de PostgreSQL incluye las extensiones necesarias para el funcionamiento de la base de datos.
+
+### 4. Redis
+
+Servicio utilizado para gestionar colas de trabajos y mecanismos de comunicación entre los componentes del backend.
+
+BullMQ utiliza Redis para coordinar los procesos de ejecución y seguimiento de tareas.
+
+### 5. MinIO
+
+Sistema de almacenamiento compatible con S3, utilizado para administrar archivos y objetos relacionados con los conjuntos de datos.
+
+Incluye una consola web para administrar el almacenamiento.
+
+### 6. Servicios del Dashboard PYMES
+
+El backend también integra servicios independientes para funcionalidades de analítica empresarial.
+
+**Dashboard Backend**
+
+Desarrollado con Node.js y Express. Incluye:
+
+- Autenticación.
+- Carga de archivos.
+- Gestión de empresas.
+- Consulta de estadísticas.
+- Endpoint de verificación de estado.
+
+Rutas principales:
+
+```http
+/api/auth
+/api/upload
+/api/empresas
+/api/stats
+/api/health
+```
+
+**Dashboard Agent**
+
+Servicio desarrollado con Python y FastAPI que proporciona funcionalidades de inteligencia artificial para consultas y análisis empresariales.
+
+Integra Google Gemini y utiliza una configuración de conexión a PostgreSQL.
+
+Endpoints principales:
+
+- Consultas al agente.
+- Análisis avanzado.
+- Verificación de estado mediante `/health`.
+
+La documentación interactiva se encuentra disponible en:
+
+http://localhost:8001/docs
+
+---
 
 ## Tecnologías utilizadas
 
-**Frontend**
-- Next.js 16.
-- React.
-- TypeScript.
-- Tailwind CSS.
-- Zustand.
-- React Query.
-- NextAuth.
+| Tecnología | Uso |
+|---|---|
+| Node.js 22 | Entorno de ejecución de la API. |
+| TypeScript | Desarrollo del backend principal. |
+| Prisma | Acceso y gestión del esquema de datos. |
+| PostgreSQL | Base de datos principal. |
+| Redis | Colas y comunicación. |
+| BullMQ | Gestión de trabajos. |
+| Python 3.12 | Procesamiento de datos. |
+| FastAPI | Servicios Python. |
+| Uvicorn | Servidor ASGI. |
+| Polars / Pandas | Procesamiento de datos. |
+| MinIO | Almacenamiento de archivos. |
+| Google Gemini | Funcionalidades de inteligencia artificial. |
+| Docker Compose | Orquestación de servicios. |
 
-**Backend**
-- Node.js 22.
-- TypeScript.
-- Prisma.
-- PostgreSQL.
-- Redis.
-- BullMQ.
-
-**Procesamiento e inteligencia artificial**
-- Python 3.12.
-- FastAPI.
-- Uvicorn.
-- Polars / Pandas.
-- Google Gemini.
-
-**Infraestructura**
-- Docker.
-- Docker Compose.
-- MinIO.
-
-## Estructura del repositorio
+## Estructura del directorio
 
 ```text
-ProyectoFinal/
+backend/
 │
-├── backend/
-│   ├── api/
-│   │   ├── src/
-│   │   └── Dockerfile.dev
-│   │
-│   ├── worker/
-│   │   ├── src/
-│   │   ├── pyproject.toml
-│   │   └── Dockerfile.dev
-│   │
-│   ├── docker/
-│   │   └── postgres/
-│   │       └── init.sql
-│   │
-│   ├── docker-compose.yml
-│   ├── package.json
-│   ├── .env.example
-│   └── README.md
-│
-├── frontend/
-│   ├── public/
+├── api/
 │   ├── src/
-│   ├── package.json
-│   ├── next.config.ts
+│   └── Dockerfile.dev
+│
+├── worker/
+│   ├── src/
+│   ├── pyproject.toml
+│   ├── .python-version
 │   ├── Dockerfile.dev
 │   └── README.md
 │
-├── services/
-│   └── dashboard-pymes/
-│       ├── backend/
-│       └── agent/
+├── docker/
+│   └── postgres/
+│       └── init.sql
 │
-├── mockups/
-│
+├── docker-compose.yml
+├── package.json
+├── .env.example
 └── README.md
+```
+
+Los servicios adicionales del dashboard se encuentran en:
+
+```text
+services/
+└── dashboard-pymes/
+    ├── backend/
+    └── agent/
 ```
 
 ## Requisitos previos
 
-Para ejecutar la plataforma mediante contenedores se necesita:
+Para ejecutar todos los servicios mediante Docker:
 
-- Git.
 - Docker Desktop.
 - Docker Compose v2.
-- Conexión a internet para descargar imágenes y dependencias.
+- Git.
+- Conexión a internet.
 
-No es necesario instalar PostgreSQL, Redis, Node.js o Python para iniciar la plataforma completa mediante Docker.
+Para desarrollar los servicios individualmente:
 
-## Instalación y ejecución
+- Node.js 22.
+- pnpm.
+- Python 3.12.
+- uv.
+- PostgreSQL y Redis, si se ejecutan fuera de Docker.
 
-### 1. Clonar el repositorio
+## Configuración de variables de entorno
 
-```bash
-git clone https://github.com/JuanSebastianRojasRivera/ProyectoFinal.git
-```
-
-### 2. Ingresar al proyecto
-
-```bash
-cd ProyectoFinal
-```
-
-### 3. Ingresar al directorio del backend
-
-El archivo Docker Compose se encuentra dentro de `backend/`. Por esta razón, los comandos de Docker Compose deben ejecutarse desde ese directorio.
-
-```bash
-cd backend
-```
-
-### 4. Configurar las variables de entorno
-
-Crear el archivo `.env` a partir de la plantilla:
+Desde el directorio `backend/`, crear el archivo `.env`:
 
 **Linux / macOS:**
 
@@ -159,126 +206,209 @@ cp .env.example .env
 Copy-Item .env.example .env
 ```
 
-Revisar el archivo `.env` y completar las variables necesarias para el entorno local.
+Revisar todas las variables definidas en `.env.example`.
 
-Para utilizar las funcionalidades de inteligencia artificial, configurar la clave `GEMINI_API_KEY` cuando corresponda.
+La configuración contempla los parámetros necesarios para conectar los servicios de infraestructura, administrar credenciales y establecer la comunicación entre los componentes.
 
-No publicar el archivo `.env` ni compartir credenciales privadas.
+Entre los valores que deben revisarse se encuentran:
 
-### 5. Construir e iniciar la plataforma
+- Configuración de PostgreSQL.
+- Configuración de Redis.
+- Credenciales de MinIO.
+- Parámetros de autenticación.
+- Variables de conexión entre servicios.
+- Claves de proveedores externos de inteligencia artificial.
 
-Desde el directorio `backend/` ejecutar:
+### Configuración de Gemini
 
-```bash
-docker compose up --build -d
-```
-
-Este comando construye las imágenes e inicia los servicios definidos en `docker-compose.yml`.
-
-### 6. Verificar los contenedores
-
-```bash
-docker compose ps
-```
-
-Comprobar que los servicios se encuentren en ejecución y revisar su estado.
-
-### 7. Consultar los registros
-
-Para consultar los registros de todos los servicios:
-
-```bash
-docker compose logs -f
-```
-
-Para consultar un servicio específico:
-
-```bash
-docker compose logs -f api
-```
-
-El nombre del servicio debe coincidir con el definido en el archivo Docker Compose.
-
----
-
-## Direcciones de acceso
-
-| Servicio | Dirección |
-|---|---|
-| Aplicación web | http://localhost:3001 |
-| API Gateway | http://localhost:3000 |
-| Documentación Swagger | http://localhost:3000/api/docs |
-| Health Check API | http://localhost:3000/health |
-| Worker ETL | http://localhost:8000 |
-| MinIO API | http://localhost:9000 |
-| MinIO Console | http://localhost:9001 |
-| Dashboard Backend | http://localhost:3002 |
-| Dashboard Agent | http://localhost:8001 |
-| Dashboard Agent Docs | http://localhost:8001/docs |
-
-La base de datos del dashboard funciona como servicio interno y no requiere una interfaz web para utilizar la plataforma.
-
-## Verificación del funcionamiento
-
-Después de iniciar los contenedores, se recomienda realizar las siguientes comprobaciones:
-
-1. Consultar el estado de los contenedores con `docker compose ps`.
-2. Abrir la aplicación web en el navegador.
-3. Consultar la documentación Swagger de la API.
-4. Verificar el endpoint `/health` de la API principal.
-5. Verificar el endpoint `/health` del Worker ETL.
-6. Consultar el endpoint `/api/health` del Dashboard Backend.
-7. Verificar el endpoint `/health` del Dashboard Agent.
-8. Comprobar que MinIO esté disponible en el puerto 9001.
-
-La disponibilidad de cada servicio depende de su configuración y de que haya iniciado correctamente.
-
-## Detener la plataforma
-
-Para detener los servicios sin eliminar los datos persistentes:
-
-```bash
-docker compose down
-```
-
-Para reconstruir las imágenes:
-
-```bash
-docker compose up --build -d
-```
-
-**Importante:** el siguiente comando elimina también los volúmenes y puede borrar las bases de datos y los archivos almacenados:
-
-```bash
-docker compose down -v
-```
-
-Utilizarlo únicamente cuando se quiera reiniciar el entorno y se tenga claro que se perderán los datos persistentes.
-
-## Configuración de inteligencia artificial
-
-La plataforma integra Google Gemini para determinadas funcionalidades de análisis y asistencia mediante inteligencia artificial.
-
-Para habilitar las funciones que dependen de este proveedor, configurar la variable correspondiente:
+Para habilitar las funcionalidades de inteligencia artificial que utilizan Google Gemini, configurar la clave correspondiente:
 
 ```env
 GEMINI_API_KEY=tu_clave_de_google_gemini
 ```
 
-La variable `GEMINI_MODEL` permite configurar el modelo cuando el servicio la contempla.
+El agente Python utiliza esta configuración para realizar las consultas y análisis que dependen del proveedor.
 
-Sin una clave válida, los servicios pueden iniciar, pero las operaciones que dependen de Gemini no estarán disponibles correctamente.
+Sin una clave válida, las funcionalidades de IA que dependen de Gemini pueden fallar.
 
-## Documentación adicional
+No compartir el archivo `.env` ni publicar claves privadas.
 
-- [Documentación del Backend](backend/README.md)
-- [Documentación del Frontend](frontend/README.md)
+---
+
+## Instalación y ejecución con Docker
+
+La ejecución integrada debe realizarse desde el directorio `backend/`, porque las rutas relativas del archivo Docker Compose hacen referencia a directorios del monorepositorio.
+
+### 1. Construir las imágenes
+
+```bash
+docker compose build
+```
+
+### 2. Iniciar los servicios
+
+```bash
+docker compose up -d
+```
+
+También es posible construir e iniciar todo en un solo paso:
+
+```bash
+docker compose up --build -d
+```
+
+### 3. Verificar el estado
+
+```bash
+docker compose ps
+```
+
+### 4. Consultar los registros
+
+```bash
+docker compose logs -f
+```
+
+Para consultar únicamente la API principal:
+
+```bash
+docker compose logs -f api
+```
+
+Para consultar los registros de los demás servicios, utilizar sus nombres exactos definidos en `docker-compose.yml`.
+
+### 5. Reiniciar los servicios
+
+```bash
+docker compose restart
+```
+
+### 6. Detener los servicios
+
+```bash
+docker compose down
+```
+
+---
+
+## Puertos y servicios
+
+| Servicio | Puerto |
+|---|---:|
+| API Gateway | 3000 |
+| Worker ETL | 8000 |
+| PostgreSQL | 5433 |
+| Redis | 6380 |
+| MinIO API | 9000 |
+| MinIO Console | 9001 |
+| Dashboard Backend | 3002 |
+| Dashboard Agent | 8001 |
+
+La base de datos del dashboard funciona dentro de la red de Docker y no requiere un puerto público para su funcionamiento integrado.
+
+## Endpoints de verificación
+
+| Servicio | Endpoint |
+|---|---|
+| API Gateway | `http://localhost:3000/health` |
+| Swagger API | `http://localhost:3000/api/docs` |
+| Worker ETL | `http://localhost:8000/health` |
+| Worker Liveness | `http://localhost:8000/health/live` |
+| Worker Readiness | `http://localhost:8000/health/ready` |
+| Dashboard Backend | `http://localhost:3002/api/health` |
+| Dashboard Agent | `http://localhost:8001/health` |
+| Dashboard Agent Docs | `http://localhost:8001/docs` |
+
+## Desarrollo individual del Worker ETL
+
+El Worker utiliza Python 3.12 y el administrador de dependencias `uv`.
+
+Desde el directorio del Worker:
+
+```bash
+cd worker
+```
+
+Instalar dependencias de desarrollo:
+
+```bash
+uv sync --extra dev
+```
+
+Iniciar el servidor:
+
+```bash
+uv run uvicorn src.main:app --reload --port 8000
+```
+
+Ejecutar pruebas:
+
+```bash
+uv run pytest
+```
+
+## Desarrollo individual de la API
+
+La API principal utiliza Node.js, TypeScript y pnpm.
+
+Las dependencias deben instalarse respetando la configuración del workspace definida en los archivos `package.json` y `pnpm-workspace.yaml` del backend.
+
+Para consultar los scripts disponibles:
+
+```bash
+pnpm run
+```
+
+La ejecución y compilación deben utilizar los scripts definidos por el proyecto.
+
+## Persistencia de datos
+
+Los servicios de PostgreSQL y MinIO utilizan almacenamiento persistente configurado mediante Docker Compose.
+
+Para detener los contenedores sin eliminar la información:
+
+```bash
+docker compose down
+```
+
+**Advertencia:** no utilizar `docker compose down -v` si se desea conservar las bases de datos y archivos almacenados. Ese comando elimina los volúmenes asociados.
+
+## Solución de problemas
+
+### Los servicios no inician
+
+Consultar:
+
+```bash
+docker compose ps
+docker compose logs -f
+```
+
+### Error de conexión con PostgreSQL
+
+Comprobar:
+
+- Que el contenedor de PostgreSQL esté activo.
+- Que las variables de conexión sean correctas.
+- Que los servicios utilicen el hostname interno definido en Docker Compose.
+- Que el puerto local no esté ocupado.
+
+### Error de conexión con Redis
+
+Comprobar que Redis esté activo y que la URL de conexión corresponda a la configuración del entorno.
+
+### Fallos en las funcionalidades de inteligencia artificial
+
+Verificar que `GEMINI_API_KEY` esté configurada y que sea válida.
+
+### Cambios en el código que no se reflejan
+
+Reconstruir los servicios correspondientes:
+
+```bash
+docker compose up --build -d
+```
 
 ## Repositorio
 
 https://github.com/JuanSebastianRojasRivera/ProyectoFinal
-
----
-
-**PymesDataStrategy**  
-Plataforma de procesamiento inteligente y análisis de datos empresariales.
